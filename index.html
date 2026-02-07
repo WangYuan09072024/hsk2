@@ -1,0 +1,1545 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>汉语水平测试</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Microsoft YaHei", sans-serif;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.6;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e53935;
+      }
+
+      h1 {
+        color: #e53935;
+        margin-bottom: 10px;
+        font-size: 2.5rem;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 1.2rem;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .section-title {
+        background-color: #e53935;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+      }
+
+      .question {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        border-left: 4px solid #e53935;
+      }
+
+      .question-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .options {
+        margin-left: 20px;
+      }
+
+      .option {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+      }
+
+      .option input {
+        margin-right: 10px;
+      }
+
+      .audio-controls {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      audio {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .btn {
+        background-color: #e53935;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 10px 5px;
+      }
+
+      .btn:hover {
+        background-color: #c62828;
+      }
+
+      .btn-secondary {
+        background-color: #757575;
+      }
+
+      .btn-secondary:hover {
+        background-color: #616161;
+      }
+
+      .btn-container {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 80px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        resize: vertical;
+      }
+
+      .result-container {
+        background-color: #e8f5e9;
+        padding: 25px;
+        border-radius: 10px;
+        margin-top: 30px;
+        display: none;
+      }
+
+      .result-title {
+        color: #2e7d32;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .score {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        color: #e53935;
+        margin: 20px 0;
+      }
+
+      .result-details {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+
+      .result-section {
+        flex: 1;
+        min-width: 200px;
+        margin: 10px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-section h3 {
+        color: #e53935;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .correct {
+        color: #4caf50;
+        font-weight: bold;
+      }
+
+      .incorrect {
+        color: #f44336;
+        font-weight: bold;
+      }
+
+      .correct-answer {
+        background-color: #e8f5e9;
+        padding: 5px 10px;
+        border-radius: 3px;
+        margin-top: 5px;
+        font-size: 0.9rem;
+      }
+
+      .audio-note {
+        background-color: #fff3e0;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        color: #ef6c00;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .result-details {
+          flex-direction: column;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>汉语水平测试</h1>
+        <div class="subtitle">
+          姓名：<input type="text" id="studentName" placeholder="请输入姓名" />
+          日期：<input type="date" id="testDate" />
+        </div>
+      </div>
+
+      <!-- 听力理解部分 -->
+      <div class="section">
+        <div class="section-title">第一部分：听力理解 (第1-20题)</div>
+
+        <div class="audio-note">
+          <p>
+            <strong>注意：</strong
+            >在实际应用中，您需要将下面的音频URL替换为实际的音频文件地址。这里使用示例音频演示。
+          </p>
+          <p>
+            听力音频控制：<button class="btn btn-secondary" id="playAllAudio">
+              播放全部听力音频
+            </button>
+          </p>
+        </div>
+
+        <!-- 判断对错部分 -->
+        <div class="question">
+          <div class="question-title">一、第1-5题：判断对错。</div>
+
+          <div class="audio-controls">
+            <span>第1-5题听力：</span>
+            <button class="btn btn-secondary" onclick="playAudio('audio1')">
+              播放
+            </button>
+          </div>
+
+          <div id="question1">
+            <p>1. 他爸爸工作不忙。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q1" value="true" /> 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q1" value="false" /> 错</label
+              >
+            </div>
+          </div>
+
+          <div id="question2">
+            <p>2. 他的笔是黑色的。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q2" value="true" /> 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q2" value="false" /> 错</label
+              >
+            </div>
+          </div>
+
+          <div id="question3">
+            <p>3. 明天天气不错。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q3" value="true" /> 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q3" value="false" /> 错</label
+              >
+            </div>
+          </div>
+
+          <div id="question4">
+            <p>4. 他觉得这件衣服不贵。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q4" value="true" /> 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q4" value="false" /> 错</label
+              >
+            </div>
+          </div>
+
+          <div id="question5">
+            <p>5. 小猫不在桌子上。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q5" value="true" /> 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q5" value="false" /> 错</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 选择图片部分 -->
+        <div class="question">
+          <div class="question-title">二、第6-10题：选择图片。</div>
+
+          <div class="audio-controls">
+            <span>第6-10题听力：</span>
+            <button class="btn btn-secondary" onclick="playAudio('audio2')">
+              播放
+            </button>
+          </div>
+
+          <div id="question6">
+            <p>6. A. 一个人写字 B. 一个人打电话 C. 一个人看书</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q6" value="A" /> A</label
+              >
+              <label class="option"
+                ><input type="radio" name="q6" value="B" /> B</label
+              >
+              <label class="option"
+                ><input type="radio" name="q6" value="C" /> C</label
+              >
+            </div>
+          </div>
+
+          <div id="question7">
+            <p>7. A. 面包和牛奶 B. 鱼和米饭 C. 面条和鸡蛋</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q7" value="A" /> A</label
+              >
+              <label class="option"
+                ><input type="radio" name="q7" value="B" /> B</label
+              >
+              <label class="option"
+                ><input type="radio" name="q7" value="C" /> C</label
+              >
+            </div>
+          </div>
+
+          <div id="question8">
+            <p>8. A. 在公园唱歌 B. 在家看电视 C. 在学校学习</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q8" value="A" /> A</label
+              >
+              <label class="option"
+                ><input type="radio" name="q8" value="B" /> B</label
+              >
+              <label class="option"
+                ><input type="radio" name="q8" value="C" /> C</label
+              >
+            </div>
+          </div>
+
+          <div id="question9">
+            <p>9. A. 骑自行车 B. 走路 C. 坐公共汽车</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q9" value="A" /> A</label
+              >
+              <label class="option"
+                ><input type="radio" name="q9" value="B" /> B</label
+              >
+              <label class="option"
+                ><input type="radio" name="q9" value="C" /> C</label
+              >
+            </div>
+          </div>
+
+          <div id="question10">
+            <p>10. A. 两个人一样高 B. 哥哥高 C. 弟弟高</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q10" value="A" /> A</label
+              >
+              <label class="option"
+                ><input type="radio" name="q10" value="B" /> B</label
+              >
+              <label class="option"
+                ><input type="radio" name="q10" value="C" /> C</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 听短对话部分 -->
+        <div class="question">
+          <div class="question-title">三、第11-20题：听短对话，回答问题。</div>
+
+          <div class="audio-controls">
+            <span>第11-20题听力：</span>
+            <button class="btn btn-secondary" onclick="playAudio('audio3')">
+              播放
+            </button>
+          </div>
+
+          <div id="question11">
+            <p>11. 男的新手机怎么样？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q11" value="A" /> A.
+                颜色不好看</label
+              >
+              <label class="option"
+                ><input type="radio" name="q11" value="B" /> B.
+                照相不清楚</label
+              >
+              <label class="option"
+                ><input type="radio" name="q11" value="C" /> C. 很不错</label
+              >
+            </div>
+          </div>
+
+          <div id="question12">
+            <p>12. 他们怎么去书店？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q12" value="A" /> A. 走路</label
+              >
+              <label class="option"
+                ><input type="radio" name="q12" value="B" /> B. 坐地铁</label
+              >
+              <label class="option"
+                ><input type="radio" name="q12" value="C" /> C. 坐出租车</label
+              >
+            </div>
+          </div>
+
+          <div id="question13">
+            <p>13. 男的为什么迟到？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q13" value="A" /> A.
+                电影开始了</label
+              >
+              <label class="option"
+                ><input type="radio" name="q13" value="B" /> B. 公交车慢</label
+              >
+              <label class="option"
+                ><input type="radio" name="q13" value="C" /> C.
+                他不知道电影院在哪儿</label
+              >
+            </div>
+          </div>
+
+          <div id="question14">
+            <p>14. 小狗是谁的？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q14" value="A" /> A. 女人的</label
+              >
+              <label class="option"
+                ><input type="radio" name="q14" value="B" /> B. 男人的</label
+              >
+              <label class="option"
+                ><input type="radio" name="q14" value="C" /> C.
+                女人的朋友的</label
+              >
+            </div>
+          </div>
+
+          <div id="question15">
+            <p>15. 关于男的弟弟，我们知道什么？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q15" value="A" /> A. 他会游泳</label
+              >
+              <label class="option"
+                ><input type="radio" name="q15" value="B" /> B.
+                他每周去学游泳</label
+              >
+              <label class="option"
+                ><input type="radio" name="q15" value="C" /> C.
+                他不想学游泳</label
+              >
+            </div>
+          </div>
+
+          <div id="question16">
+            <p>16. 他们在哪儿？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q16" value="A" /> A. 书店</label
+              >
+              <label class="option"
+                ><input type="radio" name="q16" value="B" /> B. 饭店</label
+              >
+              <label class="option"
+                ><input type="radio" name="q16" value="C" /> C. 电影院</label
+              >
+            </div>
+          </div>
+
+          <div id="question17">
+            <p>17. 男的汉语学了多长时间？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q17" value="A" /> A. 一年</label
+              >
+              <label class="option"
+                ><input type="radio" name="q17" value="B" /> B. 半年</label
+              >
+              <label class="option"
+                ><input type="radio" name="q17" value="C" /> C. 两年</label
+              >
+            </div>
+          </div>
+
+          <div id="question18">
+            <p>18. 红衣服是谁买的？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q18" value="A" /> A. 女人自己</label
+              >
+              <label class="option"
+                ><input type="radio" name="q18" value="B" /> B.
+                女人的妈妈</label
+              >
+              <label class="option"
+                ><input type="radio" name="q18" value="C" /> C.
+                男人的妈妈</label
+              >
+            </div>
+          </div>
+
+          <div id="question19">
+            <p>19. 现在几点了？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q19" value="A" /> A. 8:50</label
+              >
+              <label class="option"
+                ><input type="radio" name="q19" value="B" /> B. 9:00</label
+              >
+              <label class="option"
+                ><input type="radio" name="q19" value="C" /> C. 9:10</label
+              >
+            </div>
+          </div>
+
+          <div id="question20">
+            <p>20. 周末女人想先做什么？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q20" value="A" /> A. 看电影</label
+              >
+              <label class="option"
+                ><input type="radio" name="q20" value="B" /> B. 打扫房间</label
+              >
+              <label class="option"
+                ><input type="radio" name="q20" value="C" /> C. 去公园</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阅读理解部分 -->
+      <div class="section">
+        <div class="section-title">第二部分：阅读理解 (第21-40题)</div>
+
+        <div class="question">
+          <div class="question-title">四、第21-25题：连线。</div>
+
+          <div id="question21">
+            <p>21. 我觉得有点儿冷。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q21" value="A" /> A.
+                苹果、橘子、葡萄都有。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q21" value="B" /> B.
+                可能他生病了。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q21" value="C" /> C.
+                你应该把窗户关上。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q21" value="D" /> D.
+                我们下个星期再去吧。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q21" value="E" /> E.
+                你能帮我修一下吗？</label
+              >
+            </div>
+          </div>
+
+          <div id="question22">
+            <p>22. 她买了很多水果。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q22" value="A" /> A.
+                苹果、橘子、葡萄都有。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q22" value="B" /> B.
+                可能他生病了。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q22" value="C" /> C.
+                你应该把窗户关上。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q22" value="D" /> D.
+                我们下个星期再去吧。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q22" value="E" /> E.
+                你能帮我修一下吗？</label
+              >
+            </div>
+          </div>
+
+          <div id="question23">
+            <p>23. 他坐出租车去了医院。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q23" value="A" /> A.
+                苹果、橘子、葡萄都有。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q23" value="B" /> B.
+                可能他生病了。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q23" value="C" /> C.
+                你应该把窗户关上。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q23" value="D" /> D.
+                我们下个星期再去吧。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q23" value="E" /> E.
+                你能帮我修一下吗？</label
+              >
+            </div>
+          </div>
+
+          <div id="question24">
+            <p>24. 我的电脑坏了。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q24" value="A" /> A.
+                苹果、橘子、葡萄都有。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q24" value="B" /> B.
+                可能他生病了。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q24" value="C" /> C.
+                你应该把窗户关上。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q24" value="D" /> D.
+                我们下个星期再去吧。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q24" value="E" /> E.
+                你能帮我修一下吗？</label
+              >
+            </div>
+          </div>
+
+          <div id="question25">
+            <p>25. 飞机票卖完了。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q25" value="A" /> A.
+                苹果、橘子、葡萄都有。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q25" value="B" /> B.
+                可能他生病了。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q25" value="C" /> C.
+                你应该把窗户关上。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q25" value="D" /> D.
+                我们下个星期再去吧。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q25" value="E" /> E.
+                你能帮我修一下吗？</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 选词填空部分 -->
+        <div class="question">
+          <div class="question-title">五、第26-35题：选词填空。</div>
+
+          <div id="question26">
+            <p>26. 我每天______汉语。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q26" value="A" /> A. 学习</label
+              >
+              <label class="option"
+                ><input type="radio" name="q26" value="B" /> B. 读</label
+              >
+              <label class="option"
+                ><input type="radio" name="q26" value="C" /> C. 写</label
+              >
+              <label class="option"
+                ><input type="radio" name="q26" value="D" /> D. 听</label
+              >
+            </div>
+          </div>
+
+          <div id="question27">
+            <p>27. 今天天气很______，我们去公园吧！</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q27" value="A" /> A. 冷</label
+              >
+              <label class="option"
+                ><input type="radio" name="q27" value="B" /> B. 热</label
+              >
+              <label class="option"
+                ><input type="radio" name="q27" value="C" /> C. 好</label
+              >
+              <label class="option"
+                ><input type="radio" name="q27" value="D" /> D. 下雨</label
+              >
+            </div>
+          </div>
+
+          <div id="question28">
+            <p>28. 别______太快，很危险！</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q28" value="A" /> A. 走</label
+              >
+              <label class="option"
+                ><input type="radio" name="q28" value="B" /> B. 跑</label
+              >
+              <label class="option"
+                ><input type="radio" name="q28" value="C" /> C. 开车</label
+              >
+              <label class="option"
+                ><input type="radio" name="q28" value="D" /> D. 站</label
+              >
+            </div>
+          </div>
+
+          <div id="question29">
+            <p>29. 这件事我妹妹做得______我一样好。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q29" value="A" /> A. 像</label
+              >
+              <label class="option"
+                ><input type="radio" name="q29" value="B" /> B. 比</label
+              >
+              <label class="option"
+                ><input type="radio" name="q29" value="C" /> C. 和</label
+              >
+              <label class="option"
+                ><input type="radio" name="q29" value="D" /> D. 得</label
+              >
+            </div>
+          </div>
+
+          <div id="question30">
+            <p>30. 我______下个月开始游泳。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q30" value="A" /> A. 计划</label
+              >
+              <label class="option"
+                ><input type="radio" name="q30" value="B" /> B. 已经</label
+              >
+              <label class="option"
+                ><input type="radio" name="q30" value="C" /> C. 常常</label
+              >
+              <label class="option"
+                ><input type="radio" name="q30" value="D" /> D. 最</label
+              >
+            </div>
+          </div>
+
+          <div id="question31">
+            <p>31. 你______怎么回家？坐地铁吗？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q31" value="A" /> A. 明天</label
+              >
+              <label class="option"
+                ><input type="radio" name="q31" value="B" /> B. 昨天</label
+              >
+              <label class="option"
+                ><input type="radio" name="q31" value="C" /> C. 平时</label
+              >
+              <label class="option"
+                ><input type="radio" name="q31" value="D" /> D. 现在</label
+              >
+            </div>
+          </div>
+
+          <div id="question32">
+            <p>32. 这个问题______难，我需要想一想。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q32" value="A" /> A. 不</label
+              >
+              <label class="option"
+                ><input type="radio" name="q32" value="B" /> B. 没</label
+              >
+              <label class="option"
+                ><input type="radio" name="q32" value="C" /> C. 有</label
+              >
+              <label class="option"
+                ><input type="radio" name="q32" value="D" /> D. 很</label
+              >
+            </div>
+          </div>
+
+          <div id="question33">
+            <p>33. 房间里太热了，请把空调______。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q33" value="A" /> A. 关上</label
+              >
+              <label class="option"
+                ><input type="radio" name="q33" value="B" /> B. 打开</label
+              >
+              <label class="option"
+                ><input type="radio" name="q33" value="C" /> C. 拿走</label
+              >
+              <label class="option"
+                ><input type="radio" name="q33" value="D" /> D. 进来</label
+              >
+            </div>
+          </div>
+
+          <div id="question34">
+            <p>34. 爸爸对妈妈说："______你辛苦了。"</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q34" value="A" /> A. 给</label
+              >
+              <label class="option"
+                ><input type="radio" name="q34" value="B" /> B. 对</label
+              >
+              <label class="option"
+                ><input type="radio" name="q34" value="C" /> C. 向</label
+              >
+              <label class="option"
+                ><input type="radio" name="q34" value="D" /> D. 跟</label
+              >
+            </div>
+          </div>
+
+          <div id="question35">
+            <p>35. 他生病了，______今天不能来上课。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q35" value="A" /> A. 因为</label
+              >
+              <label class="option"
+                ><input type="radio" name="q35" value="B" /> B. 所以</label
+              >
+              <label class="option"
+                ><input type="radio" name="q35" value="C" /> C. 但是</label
+              >
+              <label class="option"
+                ><input type="radio" name="q35" value="D" /> D. 和</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 阅读短文部分 -->
+        <div class="question">
+          <div class="question-title">六、第36-40题：阅读短文</div>
+          <p
+            style="
+              margin-bottom: 15px;
+              background-color: #f0f0f0;
+              padding: 15px;
+              border-radius: 5px;
+            "
+          >
+            我叫小明，今年20岁，是大学生。我家有四口人：爸爸、妈妈、姐姐和我。姐姐今年25岁，已经工作了，她是一名工程师。这个周末，我们打算去看爷爷奶奶。他们住在乡下，那里很安静，有很多树。
+          </p>
+
+          <div id="question36">
+            <p>36. 小明的家里有几个人？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q36" value="A" /> A. 三个人</label
+              >
+              <label class="option"
+                ><input type="radio" name="q36" value="B" /> B. 四个人</label
+              >
+              <label class="option"
+                ><input type="radio" name="q36" value="C" /> C. 五个人</label
+              >
+            </div>
+          </div>
+
+          <div id="question37">
+            <p>37. 小明的姐姐做什么工作？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q37" value="A" /> A. 老师</label
+              >
+              <label class="option"
+                ><input type="radio" name="q37" value="B" /> B. 医生</label
+              >
+              <label class="option"
+                ><input type="radio" name="q37" value="C" /> C. 工程师</label
+              >
+            </div>
+          </div>
+
+          <div id="question38">
+            <p>38. 这个周末他们打算做什么？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q38" value="A" /> A. 在家休息</label
+              >
+              <label class="option"
+                ><input type="radio" name="q38" value="B" /> B. 去看朋友</label
+              >
+              <label class="option"
+                ><input type="radio" name="q38" value="C" /> C.
+                去看爷爷奶奶</label
+              >
+            </div>
+          </div>
+
+          <div id="question39">
+            <p>39. 文中"是"字的作用是什么？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q39" value="A" /> A. 表示存在</label
+              >
+              <label class="option"
+                ><input type="radio" name="q39" value="B" /> B. 表示时间</label
+              >
+              <label class="option"
+                ><input type="radio" name="q39" value="C" /> C.
+                强调确认事实</label
+              >
+            </div>
+          </div>
+
+          <div id="question40">
+            <p>40. "打算"的意思和哪个词最接近？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q40" value="A" /> A. 希望</label
+              >
+              <label class="option"
+                ><input type="radio" name="q40" value="B" /> B. 计划</label
+              >
+              <label class="option"
+                ><input type="radio" name="q40" value="C" /> C. 喜欢</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 书写部分 -->
+      <div class="section">
+        <div class="section-title">第三部分：书写 (第41-45题)</div>
+
+        <div class="question">
+          <p>请将下列词语组成正确的句子：</p>
+
+          <div id="question41">
+            <p>41. 我 / 吃 / 最 / 喜欢 / 面条 / 。</p>
+            <textarea
+              name="q41"
+              placeholder="请在此处写出完整句子..."
+            ></textarea>
+          </div>
+
+          <div id="question42">
+            <p>42. 他 / 在 / 家 / 看电视 / 正在 / 。</p>
+            <textarea
+              name="q42"
+              placeholder="请在此处写出完整句子..."
+            ></textarea>
+          </div>
+
+          <div id="question43">
+            <p>43. 明天 / 她 / 要 / 买 / 一辆 / 新 / 自行车 / 。</p>
+            <textarea
+              name="q43"
+              placeholder="请在此处写出完整句子..."
+            ></textarea>
+          </div>
+
+          <div id="question44">
+            <p>44. 我们 / 坐飞机 / 去 / 了 / 上海 / 已经 / 。</p>
+            <textarea
+              name="q44"
+              placeholder="请在此处写出完整句子..."
+            ></textarea>
+          </div>
+
+          <div id="question45">
+            <p>45. 弟弟 / 跑步 / 跑得 / 很快 / ， / 跟 / 运动员 / 一样 / 。</p>
+            <textarea
+              name="q45"
+              placeholder="请在此处写出完整句子..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- HSK3扩展知识部分 -->
+      <div class="section">
+        <div class="section-title">第四部分： (第46-50题)</div>
+
+        <div class="question">
+          <div id="question46">
+            <p>46. 哪句话的语序是正确的？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q46" value="A" /> A.
+                我吃饭在饭店。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q46" value="B" /> B.
+                我在饭店吃饭。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q46" value="C" /> C.
+                我吃饭饭店在。</label
+              >
+            </div>
+          </div>
+
+          <div id="question47">
+            <p>47. 下面哪个词与其他词不同类？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q47" value="A" /> A. 洗澡</label
+              >
+              <label class="option"
+                ><input type="radio" name="q47" value="B" /> B. 游泳</label
+              >
+              <label class="option"
+                ><input type="radio" name="q47" value="C" /> C. 运动</label
+              >
+              <label class="option"
+                ><input type="radio" name="q47" value="D" /> D. 音乐</label
+              >
+            </div>
+          </div>
+
+          <div id="question48">
+            <p>48. "妈妈让我早点儿回家。"这句话里的"让"是什么意思？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q48" value="A" /> A. 请</label
+              >
+              <label class="option"
+                ><input type="radio" name="q48" value="B" /> B. 叫，让</label
+              >
+              <label class="option"
+                ><input type="radio" name="q48" value="C" /> C. 给</label
+              >
+            </div>
+          </div>
+
+          <div id="question49">
+            <p>49. 选择正确的疑问词：你的书______？我的书在桌子上。</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q49" value="A" /> A. 吗</label
+              >
+              <label class="option"
+                ><input type="radio" name="q49" value="B" /> B. 呢</label
+              >
+              <label class="option"
+                ><input type="radio" name="q49" value="C" /> C. 吧</label
+              >
+              <label class="option"
+                ><input type="radio" name="q49" value="D" /> D. 了</label
+              >
+            </div>
+          </div>
+
+          <div id="question50">
+            <p>50. 哪句话的"才"用得正确？</p>
+            <div class="options">
+              <label class="option"
+                ><input type="radio" name="q50" value="A" /> A.
+                他晚上十点才做完作业。</label
+              >
+              <label class="option"
+                ><input type="radio" name="q50" value="B" /> B.
+                他才晚上十点做完作业。</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提交按钮 -->
+      <div class="btn-container">
+        <button class="btn" onclick="submitTest()">提交试卷</button>
+        <button class="btn btn-secondary" onclick="resetTest()">
+          重新开始
+        </button>
+      </div>
+
+      <!-- 结果显示区域 -->
+      <div id="resultContainer" class="result-container">
+        <h2 class="result-title">测试结果</h2>
+        <div class="score" id="scoreDisplay">0/50</div>
+
+        <div class="result-details">
+          <div class="result-section">
+            <h3>第一部分：听力理解</h3>
+            <p>正确: <span id="listeningCorrect" class="correct">0</span>/20</p>
+            <p>
+              错误: <span id="listeningIncorrect" class="incorrect">0</span>/20
+            </p>
+          </div>
+
+          <div class="result-section">
+            <h3>第二部分：阅读理解</h3>
+            <p>正确: <span id="readingCorrect" class="correct">0</span>/20</p>
+            <p>
+              错误: <span id="readingIncorrect" class="incorrect">0</span>/20
+            </p>
+          </div>
+
+          <div class="result-section">
+            <h3>第三、四部分</h3>
+            <p>正确: <span id="writingCorrect" class="correct">0</span>/10</p>
+            <p>
+              错误: <span id="writingIncorrect" class="incorrect">0</span>/10
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px">
+          <button class="btn" onclick="showAnswers()">查看正确答案</button>
+          <button class="btn btn-secondary" onclick="hideResults()">
+            隐藏结果
+          </button>
+        </div>
+
+        <div id="answersContainer" style="margin-top: 30px; display: none">
+          <h3>正确答案</h3>
+          <div id="correctAnswersList"></div>
+        </div>
+      </div>
+
+      <!-- 音频元素 -->
+      <audio id="audio1" preload="auto">
+        <source
+          src="https://assets.mixkit.co/active_storage/sfx/261/261-preview.mp3"
+          type="audio/mp3"
+        />
+        <!-- 实际应用中请替换为您的听力音频文件 -->
+      </audio>
+
+      <audio id="audio2" preload="auto">
+        <source
+          src="https://assets.mixkit.co/active_storage/sfx/261/261-preview.mp3"
+          type="audio/mp3"
+        />
+        <!-- 实际应用中请替换为您的听力音频文件 -->
+      </audio>
+
+      <audio id="audio3" preload="auto">
+        <source
+          src="https://assets.mixkit.co/active_storage/sfx/261/261-preview.mp3"
+          type="audio/mp3"
+        />
+        <!-- 实际应用中请替换为您的听力音频文件 -->
+      </audio>
+    </div>
+
+    <script>
+      // 正确答案
+      const correctAnswers = {
+        // 听力部分：第1-5题
+        q1: "false",
+        q2: "false",
+        q3: "true",
+        q4: "false",
+        q5: "true",
+
+        // 听力部分：第6-10题
+        q6: "B",
+        q7: "B",
+        q8: "A",
+        q9: "C",
+        q10: "B",
+
+        // 听力部分：第11-20题
+        q11: "C",
+        q12: "B",
+        q13: "B",
+        q14: "C",
+        q15: "B",
+        q16: "B",
+        q17: "B",
+        q18: "B",
+        q19: "A",
+        q20: "B",
+
+        // 阅读理解：第21-25题
+        q21: "C",
+        q22: "A",
+        q23: "B",
+        q24: "E",
+        q25: "D",
+
+        // 阅读理解：第26-35题
+        q26: "A",
+        q27: "C",
+        q28: "C",
+        q29: "C",
+        q30: "A",
+        q31: "C",
+        q32: "D",
+        q33: "B",
+        q34: "B",
+        q35: "B",
+
+        // 阅读理解：第36-40题
+        q36: "B",
+        q37: "C",
+        q38: "C",
+        q39: "C",
+        q40: "B",
+
+        // 书写部分：第41-45题（句子形式，将进行部分匹配）
+        q41: "我最喜欢吃面条。",
+        q42: "他正在家看电视。",
+        q43: "明天她要买一辆新自行车。",
+        q44: "我们已经坐飞机去了上海。",
+        q45: "弟弟跑步跑得很快，跟运动员一样。",
+
+        // HSK3扩展：第46-50题
+        q46: "B",
+        q47: "D",
+        q48: "B",
+        q49: "B",
+        q50: "A",
+      };
+
+      // 音频播放函数
+      function playAudio(audioId) {
+        const audio = document.getElementById(audioId);
+        audio.currentTime = 0;
+        audio.play();
+      }
+
+      // 播放全部听力音频
+      document
+        .getElementById("playAllAudio")
+        .addEventListener("click", function () {
+          playAudio("audio1");
+
+          // 第一个音频结束后播放第二个
+          document
+            .getElementById("audio1")
+            .addEventListener("ended", function () {
+              playAudio("audio2");
+
+              // 第二个音频结束后播放第三个
+              document
+                .getElementById("audio2")
+                .addEventListener("ended", function () {
+                  playAudio("audio3");
+                });
+            });
+        });
+
+      // 提交试卷函数
+      function submitTest() {
+        const studentName =
+          document.getElementById("studentName").value || "匿名";
+        const testDate =
+          document.getElementById("testDate").value ||
+          new Date().toISOString().split("T")[0];
+
+        let correctCount = 0;
+        let listeningCorrect = 0;
+        let readingCorrect = 0;
+        let writingCorrect = 0;
+
+        // 检查所有问题
+        for (let i = 1; i <= 50; i++) {
+          const questionId = `q${i}`;
+          const userAnswer = getUserAnswer(questionId);
+          const correctAnswer = correctAnswers[questionId];
+
+          // 对于书写题（41-45），进行部分匹配
+          if (i >= 41 && i <= 45) {
+            if (isSentenceSimilar(userAnswer, correctAnswer)) {
+              correctCount++;
+              writingCorrect++;
+              markQuestionCorrect(questionId);
+            } else {
+              markQuestionIncorrect(questionId, correctAnswer);
+            }
+          } else {
+            // 对于选择题
+            if (userAnswer === correctAnswer) {
+              correctCount++;
+
+              // 统计各部分正确数量
+              if (i <= 20) listeningCorrect++;
+              else if (i <= 40) readingCorrect++;
+              else writingCorrect++;
+
+              markQuestionCorrect(questionId);
+            } else {
+              markQuestionIncorrect(questionId, correctAnswer);
+            }
+          }
+        }
+
+        // 显示结果
+        document.getElementById("scoreDisplay").textContent =
+          `${correctCount}/50`;
+        document.getElementById("listeningCorrect").textContent =
+          listeningCorrect;
+        document.getElementById("listeningIncorrect").textContent =
+          20 - listeningCorrect;
+        document.getElementById("readingCorrect").textContent = readingCorrect;
+        document.getElementById("readingIncorrect").textContent =
+          20 - readingCorrect;
+        document.getElementById("writingCorrect").textContent = writingCorrect;
+        document.getElementById("writingIncorrect").textContent =
+          10 - writingCorrect;
+
+        // 显示结果容器
+        document.getElementById("resultContainer").style.display = "block";
+
+        // 滚动到结果
+        document
+          .getElementById("resultContainer")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      // 获取用户答案
+      function getUserAnswer(questionId) {
+        const questionElement = document.querySelector(
+          `[name="${questionId}"]`,
+        );
+
+        if (!questionElement) return "";
+
+        if (questionElement.tagName === "TEXTAREA") {
+          return questionElement.value.trim();
+        } else {
+          const selectedOption = document.querySelector(
+            `[name="${questionId}"]:checked`,
+          );
+          return selectedOption ? selectedOption.value : "";
+        }
+      }
+
+      // 句子相似性检查（用于书写题）
+      function isSentenceSimilar(userSentence, correctSentence) {
+        if (!userSentence) return false;
+
+        // 简单比较：去除标点和空格后比较
+        const normalize = (str) => {
+          return str.replace(/[。，、\s]/g, "");
+        };
+
+        const normalizedUser = normalize(userSentence);
+        const normalizedCorrect = normalize(correctSentence);
+
+        return normalizedUser === normalizedCorrect;
+      }
+
+      // 标记问题正确
+      function markQuestionCorrect(questionId) {
+        const questionElement = document.getElementById(
+          `question${questionId.substring(1)}`,
+        );
+        if (questionElement) {
+          questionElement.style.backgroundColor = "#e8f5e9";
+          questionElement.style.borderLeftColor = "#4caf50";
+        }
+      }
+
+      // 标记问题错误并显示正确答案
+      function markQuestionIncorrect(questionId, correctAnswer) {
+        const questionElement = document.getElementById(
+          `question${questionId.substring(1)}`,
+        );
+        if (questionElement) {
+          questionElement.style.backgroundColor = "#ffebee";
+          questionElement.style.borderLeftColor = "#f44336";
+
+          // 添加正确答案提示
+          let correctText = "";
+          if (questionId >= "q41" && questionId <= "q45") {
+            correctText = `正确答案：${correctAnswer}`;
+          } else {
+            // 对于选择题，显示正确选项
+            const options = {
+              true: "对",
+              false: "错",
+              A: "A",
+              B: "B",
+              C: "C",
+              D: "D",
+              E: "E",
+            };
+            correctText = `正确答案：${options[correctAnswer]}`;
+          }
+
+          const answerDiv = document.createElement("div");
+          answerDiv.className = "correct-answer";
+          answerDiv.textContent = correctText;
+          questionElement.appendChild(answerDiv);
+        }
+      }
+
+      // 显示所有正确答案
+      function showAnswers() {
+        const container = document.getElementById("answersContainer");
+        const list = document.getElementById("correctAnswersList");
+
+        list.innerHTML = "";
+
+        // 添加所有正确答案
+        for (let i = 1; i <= 50; i++) {
+          const questionId = `q${i}`;
+          const correctAnswer = correctAnswers[questionId];
+
+          let displayAnswer = correctAnswer;
+
+          // 格式化答案显示
+          if (i <= 5) {
+            displayAnswer = correctAnswer === "true" ? "对" : "错";
+          } else if (i >= 41 && i <= 45) {
+            displayAnswer = correctAnswer;
+          } else {
+            // 对于选择题，显示选项字母
+            displayAnswer = correctAnswer;
+          }
+
+          const answerItem = document.createElement("p");
+          answerItem.innerHTML = `<strong>第${i}题：</strong> ${displayAnswer}`;
+          list.appendChild(answerItem);
+        }
+
+        container.style.display = "block";
+      }
+
+      // 隐藏结果
+      function hideResults() {
+        document.getElementById("resultContainer").style.display = "none";
+      }
+
+      // 重置测试
+      function resetTest() {
+        // 重置所有单选按钮
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach((radio) => {
+          radio.checked = false;
+        });
+
+        // 重置所有文本区域
+        const textAreas = document.querySelectorAll("textarea");
+        textAreas.forEach((textarea) => {
+          textarea.value = "";
+        });
+
+        // 重置问题样式
+        for (let i = 1; i <= 50; i++) {
+          const questionElement = document.getElementById(`question${i}`);
+          if (questionElement) {
+            questionElement.style.backgroundColor = "#f9f9f9";
+            questionElement.style.borderLeftColor = "#e53935";
+
+            // 移除正确答案提示
+            const correctAnswerDiv =
+              questionElement.querySelector(".correct-answer");
+            if (correctAnswerDiv) {
+              correctAnswerDiv.remove();
+            }
+          }
+        }
+
+        // 隐藏结果
+        hideResults();
+
+        // 隐藏答案容器
+        document.getElementById("answersContainer").style.display = "none";
+      }
+
+      // 初始化日期为今天
+      document.getElementById("testDate").valueAsDate = new Date();
+    </script>
+  </body>
+</html>
